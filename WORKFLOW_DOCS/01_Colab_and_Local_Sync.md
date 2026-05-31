@@ -35,3 +35,16 @@ After saving from Colab, the updated file exists on GitHub's servers, not your l
    git pull
    ```
 3. Your local files are now up to date with your Colab progress.
+
+---
+
+## 5. Automated Sync Option (Simplest Method)
+Instead of running manual Git commands to push and pull your changes, you can use the interactive CLI helper script located at `/home/nobara/learning/learning_helper.sh`:
+
+1. Run the script:
+   ```bash
+   /home/nobara/learning/learning_helper.sh
+   ```
+2. Choose option `2` (`Sync Local <-> GitHub Fork`).
+3. Select your repository from the list, and pick whether you want to **Pull**, **Push**, or **Sync Both**.
+
