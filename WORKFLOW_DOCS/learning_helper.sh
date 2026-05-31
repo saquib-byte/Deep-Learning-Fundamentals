@@ -121,7 +121,24 @@ setup_new_course() {
     git commit -m "Initialize workspace with @saquib-byte's automation tools"
     git push origin main
     
-    success "Setup complete! Repo cloned at: $target_dir"
+    echo -e "\n============================================="
+    success "Setup complete!"
+    info "Your new learning environment is located at:"
+    echo -e "${YELLOW}  $target_dir ${NC}"
+    echo -e "=============================================\n"
+
+    # Open file manager based on OS
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if grep -q "microsoft" /proc/version 2>/dev/null; then
+            explorer.exe "$(wslpath -w "$target_dir")" &> /dev/null || true
+        else
+            xdg-open "$target_dir" &> /dev/null || true
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        open "$target_dir" &> /dev/null || true
+    elif [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+        explorer.exe "$(cygpath -w "$target_dir")" &> /dev/null || explorer.exe "$target_dir" &> /dev/null || true
+    fi
 }
 
 
@@ -244,7 +261,7 @@ while true; do
         1) setup_new_course ;;
         2) sync_menu ;;
         3) update_from_upstream ;;
-        4) echo "Goodbye!"; exit 0 ;;
+        4) echo "Goodbye!"; read -p "Press Enter to close this terminal..." ; exit 0 ;;
         *) warn "Invalid selection. Please try again." ;;
     esac
 done
