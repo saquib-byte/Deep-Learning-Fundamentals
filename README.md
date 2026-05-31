@@ -1,3 +1,32 @@
+<div align="center">
+  <h1>⚡ Deep Learning Fundamentals (Optimized) ⚡</h1>
+  <p><strong>This repository is a custom, optimized fork of the Microsoft AI-For-Beginners course.</strong></p>
+  <p>It is designed for seamless tracking of practice notebooks between <strong>VS Code (Local GPU)</strong> and <strong>Google Colab</strong>, utilizing Git Sparse-Checkout to save disk space.</p>
+</div>
+
+<br>
+
+> ### ⚠️ FOR VISITORS: Do Not Fork This Repository!
+> Forking this repository will copy my personal practice notes. 
+> To create your own isolated, highly-optimized learning environment, use my custom automation tool:
+> 
+> ```bash
+> # 1. Authenticate with GitHub CLI
+> gh auth login
+> 
+> # 2. Download the automation script and run it
+> mkdir -p ~/learning && curl -o ~/learning/learning_helper.sh https://raw.githubusercontent.com/saquib-byte/Deep-Learning-Fundamentals/main/WORKFLOW_DOCS/learning_helper.sh && chmod +x ~/learning/learning_helper.sh && ~/learning/learning_helper.sh
+> ```
+> *(The script will automatically fork the official Microsoft curriculum directly to your account, apply storage optimizations, and configure sync settings!)*
+>
+> 📖 **Curious about how this works?** Read my **[Personal Workflow Guide (MY_README.md)](MY_README.md)** to familiarize yourself with how I sync files, avoid merge conflicts, and use Google Colab!
+
+---
+
+<br>
+
+*(Below is the original Microsoft Course Curriculum)*
+
 [![GitHub license](https://img.shields.io/github/license/microsoft/AI-For-Beginners.svg)](https://github.com/microsoft/AI-For-Beginners/blob/main/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/microsoft/AI-For-Beginners.svg)](https://GitHub.com/microsoft/AI-For-Beginners/graphs/contributors/)
 [![GitHub issues](https://img.shields.io/github/issues/microsoft/AI-For-Beginners.svg)](https://GitHub.com/microsoft/AI-For-Beginners/issues/)
