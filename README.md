@@ -1,25 +1,34 @@
 <div align="center">
-  <h1>⚡ Deep Learning Fundamentals (Optimized) ⚡</h1>
-  <p><strong>This repository is a custom, optimized fork of the Microsoft AI-For-Beginners course.</strong></p>
-  <p>It is designed for seamless tracking of practice notebooks between <strong>VS Code (Local GPU)</strong> and <strong>Google Colab</strong>, utilizing Git Sparse-Checkout to save disk space.</p>
+  <h1>⚡ Deep Learning Fundamentals (Automated & Optimized) ⚡</h1>
+  <p><strong>This repository is a customized, optimized fork of the <a href="https://github.com/microsoft/AI-For-Beginners">Microsoft AI-For-Beginners</a> course.</strong></p>
+  <p>This repository provides a fully automated setup that allows you to seamlessly sync and save your practice notebooks across <strong>Google Colab (Cloud)</strong> and <strong>VS Code (Local GPU)</strong>. It ensures you never lose progress and can resume your work anywhere.</p>
 </div>
 
 <br>
 
-> ### ⚠️ FOR VISITORS: Do Not Fork This Repository!
-> Forking this repository will copy my personal practice notes. 
-> To create your own isolated, highly-optimized learning environment, use my custom automation tool:
-> 
-> ```bash
-> # 1. Authenticate with GitHub CLI
-> gh auth login
-> 
-> # 2. Download the automation script and run it
-> mkdir -p ~/learning && curl -o ~/learning/learning_helper.sh https://raw.githubusercontent.com/saquib-byte/Deep-Learning-Fundamentals/main/WORKFLOW_DOCS/learning_helper.sh && chmod +x ~/learning/learning_helper.sh && ~/learning/learning_helper.sh
-> ```
-> *(The script will automatically fork the official Microsoft curriculum directly to your account, apply storage optimizations, and configure sync settings!)*
->
-> 📖 **Curious about how this works?** Read my **[Personal Workflow Guide (MY_README.md)](MY_README.md)** to familiarize yourself with how I sync files, avoid merge conflicts, and use Google Colab!
+## 📘 Documentation Hub
+*(Wondering how to replicate this, or how it works under the hood? Check out these simple guides!)*
+
+| Guide | What It Covers (In Plain English) |
+|---|---|
+| 🚀 **[Main Setup Guide](SETUP_GUIDE.md)** | **Start here!** This explains the golden rules of the course, how to use your practice notebooks, and exactly how the automation tool replicates this entire setup for you. |
+| 🔄 **[Syncing Workflow](WORKFLOW_DOCS/01_Colab_and_Local_Sync.md)** | Explains how to safely move your work back and forth between your computer and Google Colab without breaking anything. |
+| 🏗️ **[Fork & Clone Architecture](WORKFLOW_DOCS/02_Fork_and_Clone_Architecture.md)** | A simple breakdown of how your personal GitHub account acts as a bridge between the official Microsoft course and your local computer. |
+| 💾 **[Storage Optimization](WORKFLOW_DOCS/03_Storage_Optimization.md)** | Details on how this setup uses "Git Sparse-Checkout" to strip away massive translation files, keeping your hard drive clean and saving 97% of disk space. |
+
+<br>
+
+## 🛠️ Quick Start (Auto-Setup)
+**⚠️ DO NOT FORK THIS REPOSITORY.** Forking this will copy all of my personal practice notes!
+If you want to create your own isolated, highly-optimized learning environment right now, simply run this two-step command in your terminal. It will automatically fork the course to your account, apply the storage optimizations, and link everything up:
+
+```bash
+# 1. Authenticate with your GitHub account
+gh auth login
+
+# 2. Download and execute the automation tool
+mkdir -p ~/learning && curl -o ~/learning/learning_helper.sh https://raw.githubusercontent.com/saquib-byte/Deep-Learning-Fundamentals/main/WORKFLOW_DOCS/learning_helper.sh && chmod +x ~/learning/learning_helper.sh && ~/learning/learning_helper.sh
+```
 
 ---
 

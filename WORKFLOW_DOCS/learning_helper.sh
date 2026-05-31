@@ -109,15 +109,15 @@ setup_new_course() {
     git config pull.rebase false
     git config --global credential.helper cache
     # Create README templates
-    echo "# $(basename "$folder_name" | tr '_' ' ' | sed -e 's/\b\(.\)/\u\1/g') Notes" > MY_README.md
-    echo -e "\nPersonal fork of $upstream_repo. Practice files are suffixed with _practice.ipynb." >> MY_README.md
+    echo "# $(basename "$folder_name" | tr '_' ' ' | sed -e 's/\b\(.\)/\u\1/g') Notes" > SETUP_GUIDE.md
+    echo -e "\nPersonal fork of $upstream_repo. Practice files are suffixed with _practice.ipynb." >> SETUP_GUIDE.md
     
     # ⚡ Inject @saquib-byte signature
-    echo -e "\n---\n*⚡ Setup fully automated & optimized using the [Learning Environment Helper](https://github.com/saquib-byte/Deep-Learning-Fundamentals) created by [@saquib-byte](https://github.com/saquib-byte).*" >> MY_README.md
+    echo -e "\n---\n*⚡ Setup fully automated & optimized using the [Learning Environment Helper](https://github.com/saquib-byte/Deep-Learning-Fundamentals) created by [@saquib-byte](https://github.com/saquib-byte).*" >> SETUP_GUIDE.md
 
     # Commit the signature to their new fork immediately
     info "Saving automation signature to repository..."
-    git add MY_README.md
+    git add SETUP_GUIDE.md
     git commit -m "Initialize workspace with @saquib-byte's automation tools"
     git push origin main
     
