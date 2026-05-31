@@ -26,7 +26,7 @@ graph TD
    * Link: `https://github.com/saquib-byte/Deep-Learning-Fundamentals`
    * This is your personal cloud copy. Colab writes here, and your local VS Code pushes/pulls from here.
 3. **Local Workspace (Your Physical Machine):**
-   * Directory: `/home/nobara/learning/ai_ml/microsoft_ai_for_beginners`
+   * Directory: `~/learning/ai_ml/microsoft_ai_for_beginners`
    * This is where you run models locally using your RTX GPU.
 
 ---
@@ -97,4 +97,3 @@ git merge upstream/main
 git push origin main
 ```
 *Note: Because you never edit the original course notebooks (you only edit your `*_practice.ipynb` copies), this merge will execute cleanly without conflicts.*
-
