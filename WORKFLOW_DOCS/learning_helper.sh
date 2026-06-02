@@ -165,6 +165,7 @@ setup_new_course() {
     # Configure best practices
     git config pull.rebase false
     git config --local credential.helper cache
+    git config --local merge.ours.driver true
     
     # 🛡️ Write the pre-commit hook to block original notebook edits
     cat << 'EOF' > .git/hooks/pre-commit
@@ -184,10 +185,16 @@ EOF
     # ⚡ Inject @saquib-byte signature to the bottom of the cloned SETUP_GUIDE
     echo -e "\n---\n*⚡ Setup fully automated & optimized using the [Learning Environment Helper](https://github.com/saquib-byte/Deep-Learning-Fundamentals) created by [@saquib-byte](https://github.com/saquib-byte).*" >> SETUP_GUIDE.md
 
-    # Commit the signature to their new fork immediately
+    # ✂️ Purge inherited Microsoft workflows to save GitHub Action minutes
+    if [ -d ".github/workflows" ]; then
+        info "Purging inherited GitHub Actions to save free-tier minutes..."
+        git rm -rf .github/workflows
+    fi
+
+    # Commit the signature and purges to their new fork immediately
     info "Saving automation signature to repository..."
     git add SETUP_GUIDE.md
-    git commit -m "Initialize workspace with @saquib-byte's automation tools"
+    git commit -m "Initialize workspace with @saquib-byte's automation tools & purge actions"
     git push origin main
     
     echo -e "\n=========================================================================="
@@ -357,6 +364,14 @@ update_from_upstream() {
     git fetch upstream
     info "Merging updates into local main branch..."
     git merge upstream/main --no-edit
+    
+    # ✂️ Purge inherited Microsoft workflows again if they snuck back in
+    if [ -d ".github/workflows" ]; then
+        info "Purging inherited GitHub Actions to save free-tier minutes..."
+        git rm -rf .github/workflows
+        git commit -m "chore: purge inherited github actions after upstream merge" || true
+    fi
+
     info "Pushing updates to your GitHub fork..."
     git push origin main
     success "Successfully updated fork and local files with official changes!"
