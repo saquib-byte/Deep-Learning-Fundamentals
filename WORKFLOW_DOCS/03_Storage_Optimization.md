@@ -19,7 +19,7 @@ Sparse-Checkout instructs your local Git client to essentially "hide" specific d
 If you need to clone the repository to another machine in the future:
 ```bash
 # 1. Clone without checking out files immediately to save time and disk space
-git clone --no-checkout https://github.com/saquib-byte/Deep-Learning-Fundamentals.git microsoft_ai_for_beginners
+git clone --no-checkout https://github.com/<your-github-username>/<your-repo-name>.git microsoft_ai_for_beginners
 cd microsoft_ai_for_beginners
 
 # 2. Initialize sparse checkout in pattern (non-cone) mode

@@ -165,6 +165,22 @@ setup_new_course() {
     # Configure best practices
     git config pull.rebase false
     git config --local credential.helper cache
+    
+    # 🛡️ Write the pre-commit hook to block original notebook edits
+    cat << 'EOF' > .git/hooks/pre-commit
+#!/bin/sh
+staged_originals=$(git diff --cached --name-only --diff-filter=ACM | grep '^lessons/.*\.ipynb$' | grep -v '_practice\.ipynb$' || true)
+if [ -n "$staged_originals" ]; then
+    echo "❌ ERROR: You are attempting to commit original course notebooks!"
+    echo "The golden rule is to NEVER edit the original notebooks."
+    echo "Please unstage these files ('git restore --staged <file>') and rename/duplicate them with a '_practice.ipynb' suffix manually."
+    echo "For full instructions, refer to: https://github.com/saquib-byte/Deep-Learning-Fundamentals/blob/main/SETUP_GUIDE.md"
+    exit 1
+fi
+exit 0
+EOF
+    chmod +x .git/hooks/pre-commit
+
     # ⚡ Inject @saquib-byte signature to the bottom of the cloned SETUP_GUIDE
     echo -e "\n---\n*⚡ Setup fully automated & optimized using the [Learning Environment Helper](https://github.com/saquib-byte/Deep-Learning-Fundamentals) created by [@saquib-byte](https://github.com/saquib-byte).*" >> SETUP_GUIDE.md
 
@@ -174,11 +190,34 @@ setup_new_course() {
     git commit -m "Initialize workspace with @saquib-byte's automation tools"
     git push origin main
     
-    echo -e "\n============================================="
-    success "Setup complete!"
+    echo -e "\n=========================================================================="
+    success "🎉 Setup complete! You are now fully ready to learn: $(basename "$upstream_repo")"
     info "Your new learning environment is located at:"
     echo -e "${YELLOW}  $target_dir ${NC}"
-    echo -e "=============================================\n"
+    echo -e "--------------------------------------------------------------------------"
+    echo -e "${GREEN}📚 What to do next:${NC}"
+    echo -e "1) Open the ${YELLOW}SETUP_GUIDE.md${NC} file to understand the Golden Rules."
+    echo -e "   Local: file://${target_dir}/SETUP_GUIDE.md"
+    echo -e "   GitHub: https://github.com/${username}/$(basename "$upstream_repo")/blob/main/SETUP_GUIDE.md"
+    echo -e "2) Read the Colab Sync Workflow to learn how to sync and save your notes."
+    echo -e "   Local: file://${target_dir}/WORKFLOW_DOCS/01_Colab_and_Local_Sync.md"
+    echo -e "   GitHub: https://github.com/${username}/$(basename "$upstream_repo")/blob/main/WORKFLOW_DOCS/01_Colab_and_Local_Sync.md"
+    echo -e "3) NEVER edit the original notebooks. Always rename/duplicate them with '_practice.ipynb'."
+    echo -e "==========================================================================\n"
+
+    echo -e "--- 💻 Automatic Hardware Scanner ---"
+    if command -v nvidia-smi &> /dev/null; then
+        echo -e "${GREEN}✅ NVIDIA GPU detected!${NC}"
+        echo -e "You have the hardware to run all neural network lessons locally."
+        echo -e "You can run this course ${YELLOW}both Locally (VS Code) and on the Cloud (Google Colab)${NC}."
+    else
+        echo -e "${YELLOW}⚠️ No NVIDIA GPU detected (or drivers not found).${NC}"
+        echo -e "For basic ML you can run locally, but for heavy Neural Networks,"
+        echo -e "${YELLOW}we strongly recommend using Google Colab (Cloud)${NC}."
+        echo -e "Check PyTorch's official hardware guide here:"
+        echo -e "https://pytorch.org/get-started/locally/"
+    fi
+    echo -e "-------------------------------------\n"
 
     # Open file manager based on OS
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -223,6 +262,11 @@ sync_menu() {
     repo_dir="${repos[$actual_idx]}"
     cd "$repo_dir" || return
 
+    # Ensure the attribution sticker exists before syncing
+    if [[ -f "SETUP_GUIDE.md" ]] && ! grep -q "Setup fully automated & optimized using the Learning Environment Helper" SETUP_GUIDE.md; then
+        echo -e "\n---\n*⚡ Setup fully automated & optimized using the [Learning Environment Helper](https://github.com/saquib-byte/Deep-Learning-Fundamentals) created by [@saquib-byte](https://github.com/saquib-byte).*" >> SETUP_GUIDE.md
+    fi
+
     echo -e "\nSyncing options for $(basename "$repo_dir"):"
     echo "1) Pull Colab/GitHub updates (Colab -> Local)"
     echo "2) Push Local updates (Local -> GitHub)"
@@ -241,9 +285,15 @@ sync_menu() {
             read -p "Enter commit message [Default: 'Update practice notebooks']: " msg
             if [ -z "$msg" ]; then msg="Update practice notebooks"; fi
             git commit -m "$msg"
-            info "Pushing changes..."
-            git push origin main
-            success "Pushed to GitHub fork!"
+            warn "⚠️ STOP: Please review your changes in VS Code before proceeding."
+            read -p "Have you manually reviewed the changes and authorize push? (y/N): " confirm
+            if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+                info "Push aborted. Review your changes and run the script again."
+            else
+                info "Pushing changes..."
+                git push origin main
+                success "Pushed to GitHub fork!"
+            fi
             ;;
         3)
             info "Pulling updates from GitHub..."
@@ -253,9 +303,15 @@ sync_menu() {
             read -p "Enter commit message [Default: 'Update practice notebooks']: " msg
             if [ -z "$msg" ]; then msg="Update practice notebooks"; fi
             git commit -m "$msg"
-            info "Pushing changes..."
-            git push origin main
-            success "Full sync complete!"
+            warn "⚠️ STOP: Please review your changes in VS Code before proceeding."
+            read -p "Have you manually reviewed the changes and authorize push? (y/N): " confirm
+            if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+                info "Push aborted. Review your changes and run the script again."
+            else
+                info "Pushing changes..."
+                git push origin main
+                success "Full sync complete!"
+            fi
             ;;
         *)
             warn "Invalid option."
@@ -306,6 +362,25 @@ update_from_upstream() {
     success "Successfully updated fork and local files with official changes!"
 }
 
+self_update() {
+    echo -e "\n--- Updating Automation Script ---"
+    info "Fetching latest script from @saquib-byte's master repository..."
+    
+    local remote_url="https://raw.githubusercontent.com/saquib-byte/Deep-Learning-Fundamentals/main/WORKFLOW_DOCS/learning_helper.sh"
+    local local_script="$HOME/learning/learning_helper.sh"
+    
+    if curl -s -f -o "${local_script}.tmp" "$remote_url"; then
+        mv "${local_script}.tmp" "$local_script"
+        chmod +x "$local_script"
+        success "Script successfully updated!"
+        info "Please restart the script to apply changes."
+        exit 0
+    else
+        error "Failed to download update. Please check your internet connection or the repository URL."
+        rm -f "${local_script}.tmp"
+    fi
+}
+
 workspace_status() {
     echo -e "\n--- Workspace Status ---"
     # Find Git repositories
@@ -335,8 +410,26 @@ workspace_status() {
     cd "$repo_dir" || return
     
     info "Status for: $(basename "$repo_dir")"
+    
+    if git remote | grep -q "^upstream$"; then
+        git fetch upstream >/dev/null 2>&1 || true
+        local behind
+        behind=$(git rev-list --count main..upstream/main 2>/dev/null || echo "0")
+        if [ "$behind" -gt 0 ]; then
+            echo -e "${YELLOW}Notice: Microsoft's official curriculum has $behind new updates! Use Option 3 to sync them.${NC}"
+        else
+            echo -e "${GREEN}You are fully up to date with Microsoft's official curriculum.${NC}"
+        fi
+    fi
+    
     git fetch origin main >/dev/null 2>&1 || true
     git status
+    
+    echo ""
+    read -p "Would you like to check for updates to this automation script? (y/N): " check_update
+    if [[ "$check_update" == "y" || "$check_update" == "Y" ]]; then
+        self_update
+    fi
 }
 
 # Main Execution Loop

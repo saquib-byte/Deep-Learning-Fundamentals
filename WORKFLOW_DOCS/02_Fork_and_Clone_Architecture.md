@@ -9,7 +9,7 @@ This document explains how your local learning environment is connected to the o
 ```mermaid
 graph TD
     Upstream["Upstream (Microsoft Repo)<br/>microsoft/AI-For-Beginners"] 
-    Origin["Origin (Your Fork)<br/>saquib-byte/Deep-Learning-Fundamentals"]
+    Origin["Origin (Your Fork)<br/>&lt;your-github-username&gt;/&lt;your-repo-name&gt;"]
     Local["Local Workspace (VS Code)<br/>/learning/ai_ml/..."]
     Colab["Google Colab (Cloud Runtime)"]
 
@@ -23,7 +23,7 @@ graph TD
    * Link: `https://github.com/microsoft/AI-For-Beginners`
    * This is the read-only curriculum source. You pull updates from here, but never write directly to it.
 2. **Origin (Your GitHub Fork):**
-   * Link: `https://github.com/saquib-byte/Deep-Learning-Fundamentals`
+   * Link: `https://github.com/<your-github-username>/<your-repo-name>`
    * This is your personal cloud copy. Colab writes here, and your local VS Code pushes/pulls from here.
 3. **Local Workspace (Your Physical Machine):**
    * Directory: `~/learning/ai_ml/microsoft_ai_for_beginners`
@@ -70,7 +70,7 @@ Follow this cycle to move your progress between systems without conflicts.
    git commit -m "Save local progress"
    git push origin main
    ```
-3. **In Colab:** Go to `colab.research.google.com` -> GitHub tab -> search `saquib-byte/Deep-Learning-Fundamentals`. Open your practice notebook.
+3. **In Colab:** Go to `colab.research.google.com` -> GitHub tab -> search `<your-github-username>/<your-repo-name>`. Open your practice notebook.
 
 ### Phase 2: Colab back to Local
 1. **In Colab:** Edit your practice notebook.

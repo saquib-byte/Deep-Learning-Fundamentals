@@ -18,11 +18,30 @@
 
 <br>
 
-## 🛠️ Quick Start (Auto-Setup)
-**⚠️ DO NOT FORK THIS REPOSITORY.** Forking this will copy all of my personal practice notes!
-If you want to create your own isolated, highly-optimized learning environment right now, run the command below for your operating system. The script will automatically fork the course to your account, apply storage optimizations, and configure syncing.
+## 💻 Hardware Requirements & GPU Support
 
-*(Note: The script is smart enough to detect if you are missing tools like `git` or `gh` and will provide you with the exact installation command if needed!)*
+To run the Deep Learning notebooks locally, a dedicated **NVIDIA GPU** is highly recommended. 
+Depending on the specific lesson, you will need anywhere from **4GB to 8GB+ of VRAM** (e.g. RTX 3060 or better). 
+
+For a complete breakdown of exactly which lessons require what GPU specs, and what to do if you have an AMD/Intel/Low-End machine, please refer to the **[Hardware & GPU Requirements Guide](WORKFLOW_DOCS/01_Colab_and_Local_Sync.md#6-hardware--gpu-requirements-vram-breakdown)**.
+
+*If you don't have a high-end GPU, do not worry! This entire course is configured to seamlessly run on **Google Colab** where you get free Cloud GPUs!*
+
+<br>
+
+## 🛠️ Quick Start (Auto-Setup)
+
+> [!WARNING]
+> **DO NOT FORK THIS REPOSITORY DIRECTLY.** Forking this manually will copy all of my personal practice notes. Use the auto-setup script below to correctly fork the clean upstream curriculum.
+
+### 🛑 Prerequisite: Install Git & GitHub CLI
+Before running the setup script, you **must** have Git and the GitHub CLI (`gh`) installed and authenticated on your machine. 
+If you need help installing these tools, please refer to the **[Installation Steps in the Setup Guide](SETUP_GUIDE.md#step-1-install-git--github-cli)**.
+
+---
+
+### 🚀 Run the Automation Script
+Once your prerequisites are installed, run the command below for your operating system. The script will automatically fork the course to your account, apply massive storage optimizations, and configure your syncing environment.
 
 **For Linux / macOS / WSL:**
 ```bash
@@ -30,6 +49,7 @@ mkdir -p ~/learning && curl -o ~/learning/learning_helper.sh https://raw.githubu
 ```
 
 **For Windows (PowerShell):**
+*(Note: Native PowerShell is not supported. This command leverages Git Bash (`bash -c`) which must be installed on your system. Alternatively, use WSL.)*
 ```powershell
 bash -c "mkdir -p ~/learning && curl -o ~/learning/learning_helper.sh https://raw.githubusercontent.com/saquib-byte/Deep-Learning-Fundamentals/main/WORKFLOW_DOCS/learning_helper.sh && chmod +x ~/learning/learning_helper.sh && ~/learning/learning_helper.sh"
 ```
