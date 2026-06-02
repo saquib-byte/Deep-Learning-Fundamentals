@@ -29,7 +29,7 @@ class SimpleAILearner:
         self.weight = random.uniform(0, 5)
         self.learning_rate = 0.01  # How fast our AI learns
         
-    def predict(self, x):
+    def predict(self, x: float) -> float:
         """
         Make a prediction based on what we've learned.
         
@@ -41,7 +41,7 @@ class SimpleAILearner:
         """
         return self.weight * x
     
-    def train(self, training_data, epochs=100):
+    def train(self, training_data: list[tuple[float, float]], epochs: int = 100) -> None:
         """
         Train the AI to learn the pattern in the data.
         

@@ -13,6 +13,11 @@ AI for Beginners is a comprehensive 12-week, 24-lesson curriculum covering Artif
 
 **Key Technologies:** Python 3, Jupyter Notebooks, TensorFlow, PyTorch, Keras, OpenCV, Vue.js (for quiz app)
 
+## ⚡ Custom Automation Workflow
+This repository uses a custom automation script (`WORKFLOW_DOCS/learning_helper.sh`) to manage sparse-checkout cloning, upstream syncing, and environment setup. 
+- Custom workspaces are created in `~/learning/`, NOT in the root of this repository.
+- Always use the helper script to sync changes between local, Colab, and GitHub.
+
 **Architecture:** Educational content repository with Jupyter Notebooks organized by topic areas, supplemented by a Vue.js-based quiz application and extensive multi-language support.
 
 ## Setup Commands

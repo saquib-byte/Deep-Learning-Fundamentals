@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # ==============================================================================
 # Learning Environment Helper Script
@@ -19,12 +20,55 @@ warn() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
 # Check dependencies
-check_github_auth() {
-    if ! command -v gh &> /dev/null; then
-        error "GitHub CLI ('gh') is not installed. Please install it first."
+check_dependencies() {
+    local missing=0
+    
+    # Suggest installer command based on OS
+    local installer=""
+    local gh_pkg="gh"
+    if command -v winget &> /dev/null; then
+        installer="winget install --id"
+        gh_pkg="GitHub.cli"
+    elif command -v apt &> /dev/null; then
+        installer="sudo apt install"
+    elif command -v dnf &> /dev/null; then
+        installer="sudo dnf install"
+    elif command -v pacman &> /dev/null; then
+        installer="sudo pacman -S"
+        gh_pkg="github-cli"
+    elif command -v brew &> /dev/null; then
+        installer="brew install"
     fi
+
+    if ! command -v git &> /dev/null; then
+        warn "'git' is not installed."
+        [[ -n "$installer" ]] && info "Try running: $installer git" || info "Download from: https://git-scm.com/"
+        missing=1
+    else
+        local git_version
+        git_version=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
+        local major minor
+        major=$(echo "$git_version" | cut -d. -f1)
+        minor=$(echo "$git_version" | cut -d. -f2)
+        if [ "$major" -lt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -lt 37 ]; }; then
+            error "Git version $git_version detected. This script requires Git 2.37+ for sparse-checkout. Please upgrade Git."
+        fi
+    fi
+
+    if ! command -v gh &> /dev/null; then
+        warn "'gh' (GitHub CLI) is not installed."
+        [[ -n "$installer" ]] && info "Try running: $installer $gh_pkg" || info "Download from: https://cli.github.com/"
+        missing=1
+    fi
+
+    if [ $missing -eq 1 ]; then
+        error "Please install the missing dependencies and run the script again."
+    fi
+
     if ! gh auth status &> /dev/null; then
-        error "You are not logged into GitHub CLI. Please run: gh auth login"
+        warn "You are not logged into GitHub CLI."
+        info "Authenticating now... Please follow the prompts."
+        gh auth login || error "Failed to authenticate with GitHub CLI."
     fi
 }
 
@@ -35,12 +79,13 @@ show_menu() {
     echo -e "1) 🚀 Fork & Setup a New Course (Sparse Checkout)"
     echo -e "2) 🔄 Sync Local <-> GitHub Fork (Pull/Push)"
     echo -e "3) 🌐 Update Fork from Microsoft/Upstream"
-    echo -e "4) 🚪 Exit"
-    echo -n "Select an option [1-4]: "
+    echo -e "4) 📊 Workspace Status (Ahead/Behind/Uncommitted)"
+    echo -e "5) 🚪 Exit"
+    echo -n "Select an option [1-5]: "
 }
 
 setup_new_course() {
-    check_github_auth
+    check_dependencies
     
     echo -e "\n--- Course Setup ---"
     read -p "Enter upstream repository URL (e.g., microsoft/AI-For-Beginners): " upstream_repo
@@ -54,11 +99,23 @@ setup_new_course() {
     fi
 
     info "Forking $upstream_repo on GitHub..."
-    fork_url=$(gh repo fork "$upstream_repo" --clone=false --json url -q .url)
-    if [ $? -ne 0 ] || [ -z "$fork_url" ]; then
-        error "Failed to fork repository. Ensure the repo name is correct and you have permission."
+    local fork_url
+    fork_url=$(gh repo fork "$upstream_repo" --clone=false --json url -q .url 2>/dev/null || true)
+    
+    if [ -z "$fork_url" ]; then
+        # Check if they already forked it
+        local repo_name
+        repo_name=$(basename "$upstream_repo")
+        local username
+        username=$(gh api user -q .login)
+        if gh repo view "$username/$repo_name" &>/dev/null; then
+            warn "Fork already exists. Using your existing fork..."
+            fork_url=$(gh repo view "$username/$repo_name" --json url -q .url)
+        else
+            error "Failed to fork repository. Ensure the URL is correct and you have permission."
+        fi
     fi
-    success "Forked successfully! Fork URL: $fork_url"
+    success "Fork located: $fork_url"
 
     info "Creating target directory and initializing sparse-checkout..."
     mkdir -p "$target_dir"
@@ -66,7 +123,7 @@ setup_new_course() {
 
     # Perform sparse checkout clone
     git clone --no-checkout "$fork_url" .
-    git config --worktree core.sparseCheckoutCone false
+    git config core.sparseCheckout true
     
     # Configure exclusions
     echo "/*" > .git/info/sparse-checkout
@@ -107,12 +164,8 @@ setup_new_course() {
     
     # Configure best practices
     git config pull.rebase false
-    git config --global credential.helper cache
-    # Create README templates
-    echo "# $(basename "$folder_name" | tr '_' ' ' | sed -e 's/\b\(.\)/\u\1/g') Notes" > SETUP_GUIDE.md
-    echo -e "\nPersonal fork of $upstream_repo. Practice files are suffixed with _practice.ipynb." >> SETUP_GUIDE.md
-    
-    # ⚡ Inject @saquib-byte signature
+    git config --local credential.helper cache
+    # ⚡ Inject @saquib-byte signature to the bottom of the cloned SETUP_GUIDE
     echo -e "\n---\n*⚡ Setup fully automated & optimized using the [Learning Environment Helper](https://github.com/saquib-byte/Deep-Learning-Fundamentals) created by [@saquib-byte](https://github.com/saquib-byte).*" >> SETUP_GUIDE.md
 
     # Commit the signature to their new fork immediately
@@ -253,6 +306,39 @@ update_from_upstream() {
     success "Successfully updated fork and local files with official changes!"
 }
 
+workspace_status() {
+    echo -e "\n--- Workspace Status ---"
+    # Find Git repositories
+    repos=()
+    while IFS= read -r -d $'\0' file; do
+        repos+=("$(dirname "$file")")
+    done < <(find "$HOME/learning" -name ".git" -type d -print0)
+
+    if [ ${#repos[@]} -eq 0 ]; then
+        warn "No learning repositories found."
+        return
+    fi
+
+    echo "Select a course repository to check:"
+    for i in "${!repos[@]}"; do
+        echo "$((i+1))) $(basename "${repos[$i]}")"
+    done
+    read -p "Select course [1-${#repos[@]}]: " repo_idx
+
+    actual_idx=$((repo_idx - 1))
+    if [ $actual_idx -lt 0 ] || [ $actual_idx -ge ${#repos[@]} ]; then
+        warn "Invalid selection."
+        return
+    fi
+
+    repo_dir="${repos[$actual_idx]}"
+    cd "$repo_dir" || return
+    
+    info "Status for: $(basename "$repo_dir")"
+    git fetch origin main >/dev/null 2>&1 || true
+    git status
+}
+
 # Main Execution Loop
 while true; do
     show_menu
@@ -261,7 +347,8 @@ while true; do
         1) setup_new_course ;;
         2) sync_menu ;;
         3) update_from_upstream ;;
-        4) echo "Goodbye!"; read -p "Press Enter to close this terminal..." ; exit 0 ;;
+        4) workspace_status ;;
+        5) echo "Goodbye!"; read -p "Press Enter to close this terminal..." ; exit 0 ;;
         *) warn "Invalid selection. Please try again." ;;
     esac
 done

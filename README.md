@@ -20,14 +20,18 @@
 
 ## 🛠️ Quick Start (Auto-Setup)
 **⚠️ DO NOT FORK THIS REPOSITORY.** Forking this will copy all of my personal practice notes!
-If you want to create your own isolated, highly-optimized learning environment right now, simply run this two-step command in your terminal. It will automatically fork the course to your account, apply the storage optimizations, and link everything up:
+If you want to create your own isolated, highly-optimized learning environment right now, run the command below for your operating system. The script will automatically fork the course to your account, apply storage optimizations, and configure syncing.
 
+*(Note: The script is smart enough to detect if you are missing tools like `git` or `gh` and will provide you with the exact installation command if needed!)*
+
+**For Linux / macOS / WSL:**
 ```bash
-# 1. Authenticate with your GitHub account
-gh auth login
-
-# 2. Download and execute the automation tool
 mkdir -p ~/learning && curl -o ~/learning/learning_helper.sh https://raw.githubusercontent.com/saquib-byte/Deep-Learning-Fundamentals/main/WORKFLOW_DOCS/learning_helper.sh && chmod +x ~/learning/learning_helper.sh && ~/learning/learning_helper.sh
+```
+
+**For Windows (PowerShell):**
+```powershell
+bash -c "mkdir -p ~/learning && curl -o ~/learning/learning_helper.sh https://raw.githubusercontent.com/saquib-byte/Deep-Learning-Fundamentals/main/WORKFLOW_DOCS/learning_helper.sh && chmod +x ~/learning/learning_helper.sh && ~/learning/learning_helper.sh"
 ```
 
 ---

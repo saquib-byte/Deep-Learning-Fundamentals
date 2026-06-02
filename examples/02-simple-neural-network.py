@@ -40,18 +40,18 @@ def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
 
-def sigmoid_derivative(x):
+def sigmoid_derivative(sigmoid_output: float) -> float:
     """
     Derivative of sigmoid function - needed for learning.
     This tells us how much to adjust our weights.
     
     Args:
-        x: Sigmoid output value
+        sigmoid_output: The output value from the sigmoid function
         
     Returns:
         Derivative value
     """
-    return x * (1 - x)
+    return sigmoid_output * (1 - sigmoid_output)
 
 
 class SimpleNeuron:
@@ -80,7 +80,7 @@ class SimpleNeuron:
         # Store the last output for learning
         self.output = 0
         
-    def feedforward(self, inputs):
+    def feedforward(self, inputs: list[float]) -> float:
         """
         Calculate the neuron's output (prediction).
         This is called "forward propagation".
@@ -102,7 +102,7 @@ class SimpleNeuron:
         
         return self.output
     
-    def train(self, inputs, target, learning_rate=0.1):
+    def train(self, inputs: list[float], target: float, learning_rate: float = 0.1) -> float:
         """
         Teach the neuron to improve its predictions.
         This is called "backpropagation".
