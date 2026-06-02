@@ -17,7 +17,7 @@ Use case: Learn to classify points as "above" or "below" a line.
 import random
 import math
 
-def sigmoid(x):
+def sigmoid(input_value: float) -> float:
     """
     Sigmoid activation function: converts any value to a number between 0 and 1.
     
@@ -27,17 +27,17 @@ def sigmoid(x):
     - Values around 0.5 mean "not sure"
     
     Args:
-        x: Input value
+        input_value: Input value
         
     Returns:
         Value between 0 and 1
     """
     # Prevent overflow for very large/small numbers
-    if x > 100:
+    if input_value > 100:
         return 1.0
-    if x < -100:
+    if input_value < -100:
         return 0.0
-    return 1 / (1 + math.exp(-x))
+    return 1 / (1 + math.exp(-input_value))
 
 
 def sigmoid_derivative(sigmoid_output: float) -> float:
@@ -66,7 +66,7 @@ class SimpleNeuron:
     5. Outputs a prediction
     """
     
-    def __init__(self, num_inputs):
+    def __init__(self, num_inputs: int) -> None:
         """
         Initialize the neuron with random weights.
         
@@ -92,7 +92,7 @@ class SimpleNeuron:
             Neuron's output (between 0 and 1)
         """
         # Step 1: Multiply each input by its weight and sum them
-        total = sum(w * x for w, x in zip(self.weights, inputs))
+        total = sum(weight * input_val for weight, input_val in zip(self.weights, inputs))
         
         # Step 2: Add bias
         total += self.bias
@@ -128,7 +128,7 @@ class SimpleNeuron:
         return abs(error)
 
 
-def generate_training_data(num_samples=100):
+def generate_training_data(num_samples: int = 100) -> list[tuple[list[float], int]]:
     """
     Generate sample data for training.
     
@@ -143,18 +143,18 @@ def generate_training_data(num_samples=100):
     data = []
     for _ in range(num_samples):
         # Random point in 2D space (x, y coordinates)
-        x = random.uniform(0, 10)
-        y = random.uniform(0, 10)
+        x_coordinate = random.uniform(0, 10)
+        y_coordinate = random.uniform(0, 10)
         
         # Label: 1 if point is above the line y=x, 0 if below
-        label = 1 if y > x else 0
+        label = 1 if y_coordinate > x_coordinate else 0
         
-        data.append(([x, y], label))
+        data.append(([x_coordinate, y_coordinate], label))
     
     return data
 
 
-def visualize_decision(neuron, test_points):
+def visualize_decision(neuron: SimpleNeuron, test_points: list[tuple[list[float], int]]) -> None:
     """
     Show how the neuron classifies different points.
     
@@ -184,7 +184,7 @@ def visualize_decision(neuron, test_points):
     print(f"Accuracy: {accuracy:.1f}% ({correct}/{len(test_points)} correct)")
 
 
-def main():
+def main() -> None:
     """
     Main function - Build and train a neural network!
     """
