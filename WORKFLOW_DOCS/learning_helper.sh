@@ -287,37 +287,72 @@ sync_menu() {
             success "Workspace is up to date!"
             ;;
         2)
-            info "Staging changes..."
-            git add .
-            read -p "Enter commit message [Default: 'Update practice notebooks']: " msg
-            if [ -z "$msg" ]; then msg="Update practice notebooks"; fi
-            git commit -m "$msg"
-            warn "⚠️ STOP: Please review your changes in VS Code before proceeding."
-            read -p "Have you manually reviewed the changes and authorize push? (y/N): " confirm
-            if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-                info "Push aborted. Review your changes and run the script again."
+            # Check if there are unstaged/staged changes
+            if git diff --quiet && git diff --cached --quiet; then
+                info "No local changes to commit."
             else
-                info "Pushing changes..."
-                git push origin main
-                success "Pushed to GitHub fork!"
+                info "Staging changes..."
+                git add .
+                if ! git diff --cached --quiet; then
+                    read -p "Enter commit message [Default: 'Update practice notebooks']: " msg
+                    msg=${msg:-"Update practice notebooks"}
+                    git commit -m "$msg"
+                else
+                    info "No changes to commit after staging."
+                fi
+            fi
+
+            # Check if local is ahead of remote
+            local local_ahead
+            local_ahead=$(git rev-list --count origin/main..main 2>/dev/null || echo "0")
+            if [ "$local_ahead" -eq 0 ]; then
+                success "GitHub fork is already up to date. No push needed!"
+            else
+                warn "⚠️ STOP: Please review your changes in VS Code before proceeding."
+                read -p "Have you manually reviewed the changes and authorize push? (y/N): " confirm
+                if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+                    info "Push aborted. Review your changes and run the script again."
+                else
+                    info "Pushing $local_ahead commit(s)..."
+                    git push origin main
+                    success "Pushed to GitHub fork!"
+                fi
             fi
             ;;
         3)
             info "Pulling updates from GitHub..."
             git pull origin main
-            info "Staging changes..."
-            git add .
-            read -p "Enter commit message [Default: 'Update practice notebooks']: " msg
-            if [ -z "$msg" ]; then msg="Update practice notebooks"; fi
-            git commit -m "$msg"
-            warn "⚠️ STOP: Please review your changes in VS Code before proceeding."
-            read -p "Have you manually reviewed the changes and authorize push? (y/N): " confirm
-            if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-                info "Push aborted. Review your changes and run the script again."
+            
+            # Check if there are unstaged/staged changes
+            if git diff --quiet && git diff --cached --quiet; then
+                info "No local changes to commit."
             else
-                info "Pushing changes..."
-                git push origin main
-                success "Full sync complete!"
+                info "Staging changes..."
+                git add .
+                if ! git diff --cached --quiet; then
+                    read -p "Enter commit message [Default: 'Update practice notebooks']: " msg
+                    msg=${msg:-"Update practice notebooks"}
+                    git commit -m "$msg"
+                else
+                    info "No changes to commit after staging."
+                fi
+            fi
+
+            # Check if local is ahead of remote
+            local local_ahead
+            local_ahead=$(git rev-list --count origin/main..main 2>/dev/null || echo "0")
+            if [ "$local_ahead" -eq 0 ]; then
+                success "GitHub fork is already up to date. No push needed!"
+            else
+                warn "⚠️ STOP: Please review your changes in VS Code before proceeding."
+                read -p "Have you manually reviewed the changes and authorize push? (y/N): " confirm
+                if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+                    info "Push aborted. Review your changes and run the script again."
+                else
+                    info "Pushing $local_ahead commit(s)..."
+                    git push origin main
+                    success "Full sync complete!"
+                fi
             fi
             ;;
         *)
@@ -372,9 +407,16 @@ update_from_upstream() {
         git commit -m "chore: purge inherited github actions after upstream merge" || true
     fi
 
-    info "Pushing updates to your GitHub fork..."
-    git push origin main
-    success "Successfully updated fork and local files with official changes!"
+    # Check if local is ahead of remote (origin/main)
+    local local_ahead
+    local_ahead=$(git rev-list --count origin/main..main 2>/dev/null || echo "0")
+    if [ "$local_ahead" -eq 0 ]; then
+        success "GitHub fork and local files are already up to date. No push needed!"
+    else
+        info "Pushing updates to your GitHub fork..."
+        git push origin main
+        success "Successfully updated fork and local files with official changes!"
+    fi
 }
 
 self_update() {
