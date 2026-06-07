@@ -26,13 +26,13 @@ class SimpleSentimentAnalyzer:
     3. Uses these scores to predict sentiment of new text
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         # Store word scores (positive words get positive scores)
-        self.word_scores = {}
+        self.word_scores: dict[str, float] = {}
         # Track if we've trained
-        self.is_trained = False
+        self.is_trained: bool = False
         
-    def preprocess_text(self, text):
+    def preprocess_text(self, text: str) -> list[str]:
         """
         Clean and prepare text for analysis.
         
@@ -61,7 +61,7 @@ class SimpleSentimentAnalyzer:
         
         return words
     
-    def train(self, training_data):
+    def train(self, training_data: list[tuple[str, str]]) -> None:
         """
         Learn sentiment patterns from labeled examples.
         
@@ -72,8 +72,8 @@ class SimpleSentimentAnalyzer:
         print("🎓 Training sentiment analyzer...")
         
         # Count words in positive and negative texts
-        positive_words = Counter()
-        negative_words = Counter()
+        positive_words: Counter[str] = Counter()
+        negative_words: Counter[str] = Counter()
         
         for text, sentiment in training_data:
             words = self.preprocess_text(text)
@@ -109,7 +109,7 @@ class SimpleSentimentAnalyzer:
         for word, score in sorted_words[-5:]:
             print(f"   '{word}': {score:+.3f}")
     
-    def analyze(self, text):
+    def analyze(self, text: str) -> tuple[str, float, float]:
         """
         Predict the sentiment of new text.
         
@@ -126,8 +126,8 @@ class SimpleSentimentAnalyzer:
         words = self.preprocess_text(text)
         
         # Calculate total sentiment score
-        total_score = 0
-        word_count = 0
+        total_score: float = 0.0
+        word_count: int = 0
         
         for word in words:
             if word in self.word_scores:
@@ -138,16 +138,16 @@ class SimpleSentimentAnalyzer:
         if word_count > 0:
             avg_score = total_score / word_count
         else:
-            avg_score = 0
+            avg_score = 0.0
         
         # Determine sentiment and confidence
         sentiment = "positive" if avg_score > 0 else "negative"
-        confidence = min(abs(avg_score) * 100, 100)  # Convert to percentage
+        confidence = min(abs(avg_score) * 100.0, 100.0)  # Convert to percentage
         
         return sentiment, confidence, avg_score
 
 
-def create_training_data():
+def create_training_data() -> list[tuple[str, str]]:
     """
     Create sample training data (movie reviews with labels).
     

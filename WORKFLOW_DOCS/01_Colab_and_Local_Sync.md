@@ -43,21 +43,46 @@ After saving from Colab, the updated file exists on GitHub's servers, not your l
 
 ---
 
-## 5. Automated Sync Option (Simplest Method)
-Instead of running manual Git commands to push and pull your changes, you can use the interactive CLI helper script located at `~/learning/learning_helper.sh`:
+## 5. Sync or Run via the Learning Environment Helper (Automated Option)
+Instead of running manual Git commands, you can use the interactive helper script located at `~/learning/learning_helper.sh`. This script dynamically supports both Browser Colab (GitHub sync) and Colab CLI (terminal/IDE connection) workflows:
 
 1. Run the script:
    ```bash
    ~/learning/learning_helper.sh
    ```
-2. Choose option `2` (`Sync Local <-> GitHub Fork`).
-3. Select your repository from the list, and pick whether you want to **Pull**, **Push**, or **Sync Both**.
+2. Choose option `2` (`Sync or Run on Google Colab`).
+3. Select your course repository.
+4. Choose your preferred interaction method:
+   - **Browser Colab:** Proceed with pulling/pushing your practice notebooks via GitHub.
+   - **Colab CLI:** Open the Colab CLI sub-menu to provision VMs, execute scripts, and download files directly from your terminal.
 
-For full instructions and a detailed breakdown of all available options in the helper script, please refer to the **[Main Setup Guide](../SETUP_GUIDE.md#2-using-the-learning-environment-helper)**.
+For full instructions and a detailed breakdown of all available options, please refer to the **[Main Setup Guide](../SETUP_GUIDE.md#2-using-the-learning-environment-helper)**.
 
 ---
 
-## 6. Hardware & GPU Requirements (VRAM Breakdown)
+## 6. Working in VS Code/Terminal via Google Colab CLI
+The **Google Colab CLI** is a terminal-based tool that connects your local machine directly to remote Colab runtimes. This lets you write and edit notebooks/scripts in VS Code locally, while running the computations on Colab's cloud GPUs without ever leaving your IDE.
+
+### 1. Installation & Setup
+To use this integration, make sure the `colab` CLI tool is installed locally:
+```bash
+# Using pip
+pip install google-colab-cli
+
+# Or using uv (recommended)
+uv tool install google-colab-cli
+```
+
+### 2. Workflow Steps
+Using the helper script (Option 2 -> Option 2: Colab CLI), you can run the following commands:
+1. **Start VM:** Choose option `1` (`Start/Provision a new Colab VM`) and select your GPU type (T4, L4, or A100).
+2. **Execute File:** Choose option `3` (`Execute Notebook/Script remotely`). Select your practice notebook or Python script from the automatic file list. The script will be run on the remote VM, outputting directly to your local terminal.
+3. **Download Output/Logs:** Choose option `6` (`Download files/logs from Colab VM`) to pull model weights (checkpoints) or logs back to your local folder.
+4. **Stop VM:** Always stop the session when finished using option `5` (`Stop/Terminate Colab VM`) to avoid wasting Colab compute units!
+
+---
+
+## 7. Hardware & GPU Requirements (VRAM Breakdown)
 
 To run the Deep Learning and Neural Network notebooks smoothly, a dedicated GPU is highly recommended. Below is the hardware compatibility matrix for this course:
 

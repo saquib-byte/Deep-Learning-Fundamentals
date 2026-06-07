@@ -50,13 +50,15 @@ Run the script by typing: `~/learning/learning_helper.sh` (or `bash ~/learning/l
 
 Automates the entire process of forking the official curriculum to your GitHub account and configuring sparse-checkout so you save 97% of your disk space.
 
-#### Option 2: Sync Progress (Local <-> GitHub)
+#### Option 2: Sync or Run on Google Colab
 
-Pushes your local practice notes to GitHub, and pulls any new notes you made in Google Colab back to your local computer.
+Provides a dynamic menu depending on your chosen environment:
+- **Browser Colab:** Pulls remote notebook updates from GitHub and pushes local practice notes back to your personal fork.
+- **Colab CLI:** Provision, check status, run code, download weights, or terminate remote Colab VM instances directly from your terminal/IDE.
 
 #### Option 3: Update Curriculum (Upstream)
 
-Fetches brand new lessons and updates from the official Microsoft repository and safely merges them into your workspace without destroying your practice files.
+Setup updates or new lessons from the official upstream repository and merges them into your workspace.
 
 ---
 
@@ -65,13 +67,15 @@ Fetches brand new lessons and updates from the official Microsoft repository and
 If you are curious about what happens behind the scenes, here are the core operations the script securely handles for you when you push those buttons:
 
 * **Storage Optimization (Option 1):** It uses `git sparse-checkout set` and modifies the hidden `.git/info/sparse-checkout` file to exclude massive translation folders and redundant image files, drastically reducing your download size from gigabytes to megabytes.
-* **Syncing (Option 2):** Ensures your local and cloud work never overwrite each other by safely pulling remote changes first.
-  ```bash
-  git add .
-  git commit -m "Update practice notebooks"
-  git pull --rebase=false origin main
-  git push origin main
-  ```
+* **Syncing / Running (Option 2):**
+  - **Browser Mode:** Safely pulls and pushes changes to ensure local and cloud work never overwrite each other:
+    ```bash
+    git add .
+    git commit -m "Update practice notebooks"
+    git pull --rebase=false origin main
+    git push origin main
+    ```
+  - **Colab CLI Mode:** Leverages the official `colab` tool to provision VM instances (`colab new --gpu GPU`), run local scripts or notebooks on remote compute nodes (`colab exec -f script.ipynb`), and download files/logs (`colab download`).
 * **Updating from Microsoft (Option 3):** Automatically fetches the latest official bug fixes and new lessons from Microsoft without destroying your personal practice files.
   ```bash
   git fetch upstream main

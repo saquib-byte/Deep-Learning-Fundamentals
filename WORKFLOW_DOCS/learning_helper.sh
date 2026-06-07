@@ -77,7 +77,7 @@ show_menu() {
     echo -e "      🧠 Learning Environment Helper 🧠      "
     echo -e "============================================="
     echo -e "1) 🚀 Fork & Setup a New Course (Sparse Checkout)"
-    echo -e "2) 🔄 Sync Local <-> GitHub Fork (Pull/Push)"
+    echo -e "2) 🔄 Sync or Run on Google Colab"
     echo -e "3) 🌐 Update Fork from Microsoft/Upstream"
     echo -e "4) 📊 Workspace Status (Ahead/Behind/Uncommitted)"
     echo -e "5) 🚪 Exit"
@@ -242,7 +242,7 @@ EOF
 
 
 sync_menu() {
-    echo -e "\n--- Syncing Courses ---"
+    echo -e "\n--- Syncing/Running Courses ---"
     # Find all Git repositories in ~/learning
     repos=()
     while IFS= read -r -d $'\0' file; do
@@ -254,7 +254,7 @@ sync_menu() {
         return
     fi
 
-    echo "Select a course repository to sync:"
+    echo "Select a course repository:"
     for i in "${!repos[@]}"; do
         echo "$((i+1))) $(basename "${repos[$i]}") (${repos[$i]})"
     done
@@ -267,6 +267,27 @@ sync_menu() {
     fi
 
     repo_dir="${repos[$actual_idx]}"
+    
+    echo -e "\nChoose how you want to interact with Google Colab for $(basename "$repo_dir"): "
+    echo "1) Browser Colab (Pull/Push changes to/from GitHub fork)"
+    echo "2) Colab CLI (Execute notebooks/scripts directly from local terminal/IDE on remote Colab VM)"
+    read -p "Select option [1-2]: " colab_mode
+    
+    case $colab_mode in
+        1)
+            sync_menu_options "$repo_dir"
+            ;;
+        2)
+            manage_colab_cli "$repo_dir"
+            ;;
+        *)
+            warn "Invalid selection."
+            ;;
+    esac
+}
+
+sync_menu_options() {
+    local repo_dir="$1"
     cd "$repo_dir" || return
 
     # Ensure the attribution sticker exists before syncing
@@ -359,6 +380,140 @@ sync_menu() {
             warn "Invalid option."
             ;;
     esac
+}
+
+manage_colab_cli() {
+    local repo_dir="$1"
+    cd "$repo_dir" || return
+    
+    if ! command -v colab &>/dev/null; then
+        warn "'colab' CLI is not installed."
+        info "To install the Google Colab CLI, please run:"
+        info "  pip install google-colab-cli"
+        info "or if you have 'uv' installed:"
+        info "  uv tool install google-colab-cli"
+        return
+    fi
+    
+    while true; do
+        echo -e "\n--- Colab CLI Operations for $(basename "$repo_dir") ---"
+        echo "1) 🚀 Start/Provision a new Colab VM"
+        echo "2) 📊 Check VM Session Status"
+        echo "3) ⚡ Execute Notebook/Script remotely"
+        echo "4) 🌐 Open Session in Browser"
+        echo "5) 🛑 Stop/Terminate Colab VM"
+        echo "6) 📥 Download files/logs from Colab VM"
+        echo "7) 🔙 Go Back"
+        read -p "Select option [1-7]: " colab_opt
+        
+        case $colab_opt in
+            1)
+                read -p "Enter session name [Default: 'ai-course']: " sname
+                sname=${sname:-"ai-course"}
+                echo "Select accelerator type:"
+                echo "1) CPU"
+                echo "2) T4 GPU"
+                echo "3) L4 GPU"
+                echo "4) A100 GPU"
+                read -p "Select option [1-4, Default: 2]: " gpu_opt
+                gpu_opt=${gpu_opt:-2}
+                
+                local gpu_flag=""
+                case $gpu_opt in
+                    1) gpu_flag="" ;;
+                    2) gpu_flag="--gpu T4" ;;
+                    3) gpu_flag="--gpu L4" ;;
+                    4) gpu_flag="--gpu A100" ;;
+                    *) gpu_flag="--gpu T4" ;;
+                esac
+                
+                info "Provisioning Colab VM session '$sname'..."
+                if [ -n "$gpu_flag" ]; then
+                    colab new -s "$sname" $gpu_flag
+                else
+                    colab new -s "$sname"
+                fi
+                success "Session '$sname' provisioned successfully!"
+                ;;
+            2)
+                info "Active Colab Sessions:"
+                colab sessions || true
+                echo -e "\nSession Status Detail:"
+                colab status || true
+                ;;
+            3)
+                # Find python/notebook files in the course directory
+                info "Scanning for scripts and notebooks..."
+                files=()
+                while IFS= read -r -d $'\0' file; do
+                    rel_file="${file#./}"
+                    if [[ "$rel_file" != .git* ]] && [[ "$rel_file" != WORKFLOW_DOCS* ]] && [[ "$rel_file" != *venv* ]] && [[ "$rel_file" != *.env* ]]; then
+                        files+=("$rel_file")
+                    fi
+                done < <(find . -type f \( -name "*.ipynb" -o -name "*.py" \) -print0 | sort -z)
+                
+                if [ ${#files[@]} -eq 0 ]; then
+                    warn "No Python scripts or Jupyter Notebooks found."
+                    continue
+                fi
+                
+                echo "Available Notebooks/Scripts:"
+                for i in "${!files[@]}"; do
+                    echo "$((i+1))) ${files[$i]}"
+                done
+                read -p "Select file to execute [1-${#files[@]}]: " file_idx
+                
+                actual_file_idx=$((file_idx - 1))
+                if [ $actual_file_idx -lt 0 ] || [ $actual_file_idx -ge ${#files[@]} ]; then
+                    warn "Invalid file selection."
+                    continue
+                fi
+                
+                selected_file="${files[$actual_file_idx]}"
+                read -p "Enter session name to use [Default: 'ai-course']: " sname
+                sname=${sname:-"ai-course"}
+                
+                info "Executing '$selected_file' on Colab session '$sname'..."
+                colab exec -s "$sname" -f "$selected_file"
+                success "Execution complete!"
+                ;;
+            4)
+                read -p "Enter session name to open [Default: 'ai-course']: " sname
+                sname=${sname:-"ai-course"}
+                info "Opening session '$sname' in browser..."
+                colab url -s "$sname" --open || colab url -s "$sname"
+                ;;
+            5)
+                read -p "Enter session name to stop [Default: 'ai-course']: " sname
+                sname=${sname:-"ai-course"}
+                warn "Terminating Colab VM session '$sname'..."
+                colab stop -s "$sname"
+                success "Session stopped."
+                ;;
+            6)
+                read -p "Enter session name to download from [Default: 'ai-course']: " sname
+                sname=${sname:-"ai-course"}
+                read -p "Enter remote path on Colab VM (e.g. checkpoints/model.bin): " remote_path
+                read -p "Enter local destination path [Default: '.']: " local_path
+                local_path=${local_path:-"."}
+                
+                if [ -z "$remote_path" ]; then
+                    warn "Remote path cannot be empty."
+                    continue
+                fi
+                
+                info "Downloading '$remote_path' from session '$sname' to '$local_path'..."
+                colab download -s "$sname" "$remote_path" "$local_path"
+                success "Download completed successfully!"
+                ;;
+            7)
+                break
+                ;;
+            *)
+                warn "Invalid selection."
+                ;;
+        esac
+    done
 }
 
 update_from_upstream() {

@@ -1,7 +1,7 @@
 <div align="center">
   <h1>⚡ Deep Learning Fundamentals (Automated & Optimized) ⚡</h1>
   <p><strong>This repository is a customized, optimized fork of the <a href="https://github.com/microsoft/AI-For-Beginners">Microsoft AI-For-Beginners</a> course.</strong></p>
-  <p>This repository provides a fully automated setup that allows you to seamlessly sync and save your practice notebooks across <strong>Google Colab (Cloud)</strong> and <strong>VS Code (Local GPU)</strong>. It ensures you never lose progress and can resume your work anywhere.</p>
+  <p>This repository provides a fully automated setup that allows you to seamlessly run and sync your practice notebooks across <strong>Google Colab (Browser or CLI inside VS Code)</strong> and <strong>VS Code (Local GPU)</strong>. It ensures you never lose progress and can resume your work anywhere.</p>
 </div>
 
 <br>
@@ -12,7 +12,7 @@
 | Guide | What It Covers (In Plain English) |
 |---|---|
 | 🚀 **[Main Setup Guide](SETUP_GUIDE.md)** | **Start here!** This explains the golden rules of the course, how to use your practice notebooks, and exactly how the automation tool replicates this entire setup for you. |
-| 🔄 **[Syncing Workflow](WORKFLOW_DOCS/01_Colab_and_Local_Sync.md)** | Explains how to safely move your work back and forth between your computer and Google Colab without breaking anything. |
+| 🔄 **[Syncing Workflow](WORKFLOW_DOCS/01_Colab_and_Local_Sync.md)** | Explains how to run and sync your work on Google Colab (either via the standard browser interface or directly inside your IDE using the Colab CLI) and your local GPU. |
 | 🏗️ **[Fork & Clone Architecture](WORKFLOW_DOCS/02_Fork_and_Clone_Architecture.md)** | A simple breakdown of how your personal GitHub account acts as a bridge between the official Microsoft course and your local computer. |
 | 💾 **[Storage Optimization](WORKFLOW_DOCS/03_Storage_Optimization.md)** | Details on how this setup uses "Git Sparse-Checkout" to strip away massive translation files, keeping your hard drive clean and saving 97% of disk space. |
 
