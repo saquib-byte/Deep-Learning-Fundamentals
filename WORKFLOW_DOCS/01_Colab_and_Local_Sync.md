@@ -66,10 +66,10 @@ The **Google Colab CLI** is a terminal-based tool that connects your local machi
 ### 1. Installation & Setup
 To use this integration, make sure the `colab` CLI tool is installed locally:
 ```bash
-# Using pip
-pip install google-colab-cli
+# Using pipx (recommended for isolated CLI tools)
+pipx install google-colab-cli
 
-# Or using uv (recommended)
+# Or using uv (high-performance alternative)
 uv tool install google-colab-cli
 ```
 

@@ -388,8 +388,8 @@ manage_colab_cli() {
     
     if ! command -v colab &>/dev/null; then
         warn "'colab' CLI is not installed."
-        info "To install the Google Colab CLI, please run:"
-        info "  pip install google-colab-cli"
+        info "To install the Google Colab CLI (recommended using pipx to prevent dependency conflicts):"
+        info "  pipx install google-colab-cli"
         info "or if you have 'uv' installed:"
         info "  uv tool install google-colab-cli"
         return
