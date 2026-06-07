@@ -64,13 +64,19 @@ For full instructions and a detailed breakdown of all available options, please 
 The **Google Colab CLI** is a terminal-based tool that connects your local machine directly to remote Colab runtimes. This lets you write and edit notebooks/scripts in VS Code locally, while running the computations on Colab's cloud GPUs without ever leaving your IDE.
 
 ### 1. Installation & Setup
-To use this integration, make sure the `colab` CLI tool is installed locally:
-```bash
-# Using pipx (recommended for isolated CLI tools)
-pipx install google-colab-cli
+To use this integration, make sure the `colab` CLI tool is installed locally.
 
-# Or using uv (high-performance alternative)
+**Automatic Setup (Easiest):**
+Simply run the helper script (`~/learning/learning_helper.sh`) and select **Option 2 (Sync or Run on Google Colab)**, then choose **Option 2 (Colab CLI)**. If the CLI is not found, the script will offer to automatically install and configure it using `uv` (recommended) or `pip`.
+
+**Manual Setup:**
+Alternatively, you can run the installation command yourself:
+```bash
+# Using uv (Recommended by Google)
 uv tool install google-colab-cli
+
+# Or using standard pip
+pip install --user google-colab-cli
 ```
 
 ### 2. Workflow Steps

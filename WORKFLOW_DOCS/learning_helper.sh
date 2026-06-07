@@ -388,11 +388,53 @@ manage_colab_cli() {
     
     if ! command -v colab &>/dev/null; then
         warn "'colab' CLI is not installed."
-        info "To install the Google Colab CLI (recommended using pipx to prevent dependency conflicts):"
-        info "  pipx install google-colab-cli"
-        info "or if you have 'uv' installed:"
-        info "  uv tool install google-colab-cli"
-        return
+        info "Would you like to install the Google Colab CLI now?"
+        echo "1) Automatically install via 'uv' (Recommended by Google)"
+        echo "2) Automatically install via 'pip' (Alternative)"
+        echo "3) Print manual installation commands and skip"
+        read -p "Select option [1-3]: " inst_opt
+        
+        case $inst_opt in
+            1)
+                if ! command -v uv &>/dev/null; then
+                    warn "'uv' is not installed."
+                    info "How would you like to install 'uv'?"
+                    echo "1) Run the automatic installer script: curl -LsSf https://astral.sh/uv/install.sh | sh"
+                    echo "2) Print the manual command and skip"
+                    read -p "Select option [1-2]: " uv_opt
+                    
+                    if [[ "$uv_opt" == "1" ]]; then
+                        info "Downloading and running the official 'uv' installer..."
+                        curl -LsSf https://astral.sh/uv/install.sh | sh || { error "Failed to install 'uv'. Please install manually."; return; }
+                        export PATH="$HOME/.local/bin:$PATH"
+                    else
+                        info "To install 'uv' manually, run the following command in your terminal:"
+                        info "  curl -LsSf https://astral.sh/uv/install.sh | sh"
+                        info "After installing 'uv', run:"
+                        info "  uv tool install google-colab-cli"
+                        return
+                    fi
+                fi
+                info "Installing Google Colab CLI via uv..."
+                uv tool install google-colab-cli || { error "Failed to install google-colab-cli."; return; }
+                export PATH="$HOME/.local/bin:$PATH"
+                success "Google Colab CLI successfully installed!"
+                ;;
+            2)
+                info "Installing Google Colab CLI via pip..."
+                pip install --user google-colab-cli || { error "Failed to install google-colab-cli."; return; }
+                success "Google Colab CLI successfully installed!"
+                ;;
+            *)
+                info "Manual Installation Commands:"
+                info "  - Using 'uv' (Recommended):"
+                info "      1. Install 'uv' (if not present): curl -LsSf https://astral.sh/uv/install.sh | sh"
+                info "      2. Install CLI: uv tool install google-colab-cli"
+                info "  - Using 'pip' (Alternative):"
+                info "      pip install --user google-colab-cli"
+                return
+                ;;
+        esac
     fi
     
     while true; do
