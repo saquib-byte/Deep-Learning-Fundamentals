@@ -94,3 +94,6 @@ Now that your workspace is set up, how do you actually use it safely?
 **Why?** If you edit the original files, you will encounter massive Git merge conflicts the next time you use Option 3 to pull updates from Microsoft. To protect you, this repository includes an automated Git Hook that will actively block you from accidentally committing an edit to an original notebook!
 
 For a comprehensive breakdown on how to safely interact with your notebooks and use Google Colab for cloud GPU training, please read our **[Colab and Local Sync Workflow Guide](WORKFLOW_DOCS/01_Colab_and_Local_Sync.md)**.
+
+---
+*⚡ Setup fully automated & optimized using the [Learning Environment Helper](https://github.com/saquib-byte/Deep-Learning-Fundamentals) created by [@saquib-byte](https://github.com/saquib-byte).*
